@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Asistencia</title>
+    <link rel="stylesheet" href="css/estilo.css">
+</head>
+
+<body>
+    <!-- El encabezado principal de la página -->
+    <header class="header">
+        <!-- <header>: sección semántica que representa la cabecera de la página -->
+
+        <!-- Título de la página -->
+        <h1 class="titulo">Control de Asistencia</h1>
+        <!-- <h1>: encabezado de nivel 1, generalmente se usa para títulos principales.
+         class="titulo": permite aplicar estilos CSS a este elemento -->
+
+        <!-- Botón que activa el modo administrador -->
+        <button class="boton" onclick="activarModoAdministrador()">Modo Administrador</button>
+        <!-- <button>: crea un botón interactivo.
+         class="boton": clase para estilizar el botón desde CSS.
+         onclick="activarModoAdministrador()": llama a la función JavaScript cuando se hace clic -->
+
+        <!-- Botón para mostrar el panel de administración -->
+        <button class="boton" onclick="mostrarPanelAdministrador()">🛠 Panel de Administración</button>
+        <!-- Se incluye un emoji como ícono dentro del texto del botón -->
+    </header>
+
+    <!-- Contenedor principal del contenido -->
+    <main id="principal">
+        <!-- <main>: etiqueta semántica que contiene el contenido principal del sitio.
+         id="principal": identificador único que permite acceder a este elemento desde JavaScript o CSS -->
+
+        <!-- Sección de las carreras, organizada en forma de cuadrícula -->
+        <div class="grid" id="carreras">
+            <!-- <div>: contenedor genérico.
+             class="cuadricula": se usará para aplicar un estilo tipo grid o cuadrícula.
+             id="carreras": permite seleccionar esta sección desde JavaScript o CSS -->
+
+            <!-- Cada una de estas "tarjetas" representa una carrera técnica -->
+
+            <div class="tarjeta sistemas" onclick="mostrarAnios('Sistemas Informáticos')">
+                Sistemas Informáticos
+            </div>
+            <!-- class="tarjeta sistemas": combinación de clases, una general (tarjeta) y una específica (sistemas).
+             onclick="mostrarAnios('Sistemas Informáticos')": ejecuta una función JavaScript pasando el nombre de la carrera como argumento -->
+
+            <div class="tarjeta electronica" onclick="mostrarAnios('Electrónica')">
+                Electrónica
+            </div>
+            <!-- Similar al anterior, pero con otra carrera y clase específica -->
+
+            <div class="tarjeta alimentos" onclick="mostrarAnios('Transformación de Alimentos')">
+                Transformación de Alimentos
+            </div>
+
+            <div class="tarjeta contaduria" onclick="mostrarAnios('Contaduría General')">
+                Contaduría General
+            </div>
+
+            <!-- Estas tarjetas permiten al usuario seleccionar una carrera, lo que probablemente mostrará los años o niveles -->
+        </div>
+
+        <!-- Contenedor donde se mostrará contenido dinámico al seleccionar una carrera -->
+        <div id="contenido"></div>
+        <!-- id="contenido": se utilizará con JavaScript para insertar contenido como trimestres, listas de estudiantes, etc. -->
+    </main>
+
+    <!-- Enlace al archivo JavaScript externo que contiene la lógica de la aplicación -->
+    <script src="js/js.js"></script>
+    <!-- <script>: etiqueta que permite incluir código JavaScript.
+     src="js/js.js": ruta al archivo externo. 
+     Es una buena práctica colocarlo al final para que el HTML cargue antes de que se ejecute el JS -->
+
+</body>
+
+</html>
