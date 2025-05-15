@@ -1,418 +1,256 @@
-// ----------------------
 // 🔁 Mapeo de claves internas para los trimestres
 // ----------------------
 
-// Un objeto literal que mapea el nombre legible del trimestre a una clave corta interna (string)
+// Este objeto relaciona los nombres legibles de los trimestres con claves internas más cortas
+// que se utilizan como identificadores únicos para los documentos en Firestore.
 const clavesTrimestre = {
     "1er Trimestre": "t1",
     "2do Trimestre": "t2",
     "3er Trimestre": "t3"
 };
 
-// Otro objeto literal, pero esta vez mapea de clave interna a nombre completo
+// Este objeto es el inverso de 'clavesTrimestre' y se utiliza para mostrar los nombres legibles
+// de los trimestres a partir de sus claves internas.
 const nombresTrimestre = {
     t1: "1er Trimestre",
     t2: "2do Trimestre",
     t3: "3er Trimestre"
 };
 
-// ----------------------
-// 🔐 Variable booleana que indica si el modo administrador está activo
-// ----------------------
+// Esta variable controla si el modo administrador está activado.
+// Solo el administrador puede realizar acciones como agregar fechas o modificar asistencia.
 let modoAdministradorActivo = false;
 
 // ----------------------
-// 🔑 Función para activar el modo administrador solicitando una contraseña
+// 🔐 Función para activar el modo administrador
 // ----------------------
-function activarModoAdministrador() {
-    // prompt() muestra un cuadro de entrada de texto y devuelve lo que el usuario escribe
-    const contraseña = prompt("Introduce la contraseña de administrador:");
 
-    // Condicional if-else para validar la contraseña
-    if (contraseña === "admin123") {
-        // Si es correcta, activamos el modo admin
+function activarModoAdministrador() {
+    // Solicita al usuario una contraseña mediante un cuadro emergente
+    const contrasena = prompt("Introduce la contraseña de administrador:");
+
+    // Verifica si la contraseña ingresada es igual a 'admin123'
+    if (contrasena === "admin123") {
+        // Activa el modo administrador
         modoAdministradorActivo = true;
         alert("Modo administrador activado.");
     } else {
+        // Si la contraseña es incorrecta, muestra un mensaje de error
         alert("Contraseña incorrecta.");
     }
 }
 
 // ----------------------
-// 🧰 Función para mostrar el panel de administración (interfaz de selección)
+// 🧑‍🎓 Función para crear una lista predeterminada de 45 estudiantes
 // ----------------------
-function mostrarPanelAdministrador() {
-    // Verificamos si el modo administrador está activo
-    if (!modoAdministradorActivo) {
-        alert("Debes activar el modo administrador.");
-        return; // interrumpe la ejecución de la función si no se cumple la condición
-    }
 
-    // Seleccionamos el elemento del DOM donde se mostrará el contenido dinámico
-    const contenido = document.getElementById('contenido');
-
-    // Insertamos directamente HTML dentro del contenedor con innerHTML
-    contenido.innerHTML = `
-        <h2>🛠 Panel de Administración</h2>
-        <p>Selecciona la carrera, año y trimestre que deseas reiniciar.</p>
-        <label>Carrera:
-            <select id="adminCarrera">
-                <option>Sistemas Informáticos</option>
-                <option>Electrónica</option>
-                <option>Transformación de Alimentos</option>
-                <option>Contaduría General</option>
-            </select>
-        </label>
-        <br><br>
-        <label>Año:
-            <select id="adminAnio">
-                <option>4to</option>
-                <option>5to</option>
-                <option>6to</option>
-            </select>
-        </label>
-        <br><br>
-        <label>Trimestre:
-            <select id="adminTrimestre">
-                <option>1er Trimestre</option>
-                <option>2do Trimestre</option>
-                <option>3er Trimestre</option>
-            </select>
-        </label>
-        <br><br>
-        <button onclick="reiniciarDesdePanel()" class="boton" style="background-color: #d9534f;">❌ Eliminar datos</button>
-    `;
-}
-
-// ----------------------
-// 🧹 Función que elimina los datos almacenados para una combinación específica
-// ----------------------
-function reiniciarDesdePanel() {
-    // Obtenemos los valores seleccionados por el administrador
-    const carrera = document.getElementById('adminCarrera').value;
-    const anio = document.getElementById('adminAnio').value;
-    const trimestre = document.getElementById('adminTrimestre').value;
-
-    // Creamos la clave completa que se utiliza como identificador único en localStorage
-    const clave = `${carrera}_${anio}_${trimestre}`;
-
-    // confirm() muestra una ventana de confirmación (OK o Cancelar)
-    const confirmar = confirm(`¿Seguro que deseas eliminar todos los datos de asistencia para:\n\n${clave} ?`);
-    if (!confirmar) return; // si se cancela, detenemos la función
-
-    // Eliminamos del almacenamiento local la lista de estudiantes y las fechas
-    localStorage.removeItem(clave);
-    localStorage.removeItem(clave + '_fechas');
-
-    alert(`Datos eliminados para ${clave}`);
-    mostrarAnios(carrera); // Volvemos a la vista de los años para esa carrera
-}
-
-// ----------------------
-// 📋 Función que crea una lista por defecto con 45 estudiantes ficticios
-// ----------------------
 function crearListaEstudiantesPorDefecto() {
     const estudiantes = [];
-
-    // for loop: itera del 1 al 45
+    // Bucle for: se repite desde 1 hasta 45
     for (let i = 1; i <= 45; i++) {
-        estudiantes.push({
-            nombre: `Estudiante ${i}`,
-            asistencia: {} // objeto vacío que almacenará fechas como claves y ✓/X como valores
-        });
+        // .push(): método de los arrays que agrega un nuevo elemento al final
+        // Se agrega un objeto con dos propiedades:
+        // nombre: un texto como "Estudiante 1", "Estudiante 2", etc.
+        // asistencia: un objeto vacío que luego almacenará las marcas de asistencia por fecha
+        estudiantes.push({ nombre: `Estudiante ${i}`, asistencia: {} });
     }
-
-    return estudiantes;
+    return estudiantes; // Devuelve el arreglo completo de 45 estudiantes
 }
 
 // ----------------------
-// 🗂 Función que muestra los años escolares disponibles para una carrera
+// 📚 Función para mostrar los años disponibles según la carrera seleccionada
 // ----------------------
+
 function mostrarAnios(carrera) {
+    // document.getElementById(): método del DOM que selecciona un elemento HTML por su ID
     const contenido = document.getElementById('contenido');
+
+    // .innerHTML: propiedad que permite reemplazar el contenido HTML de un elemento
+    // En este caso, se inserta HTML con tres tarjetas para seleccionar los años escolares
     contenido.innerHTML = `
-        <h2>${carrera}</h2>
-        <div class='cuadricula'>
-            <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '4to')">4to de Secundaria</div>
-            <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '5to')">5to de Secundaria</div>
-            <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '6to')">6to de Secundaria</div>
-        </div>`;
+      <h2>${carrera}</h2>
+      <div class='cuadricula'>
+        <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '4to')">4to de Secundaria</div>
+        <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '5to')">5to de Secundaria</div>
+        <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '6to')">6to de Secundaria</div>
+      </div>`;
 }
 
 // ----------------------
-// 🧭 Función que muestra los tres trimestres disponibles para un año y carrera
+// 📅 Función para mostrar los trimestres disponibles según la carrera y el año
 // ----------------------
+
 function mostrarTrimestres(carrera, anio) {
     const contenido = document.getElementById('contenido');
+
+    // Muestra tres botones (tarjetas) para seleccionar los trimestres de un año específico
     contenido.innerHTML = `
-        <h2>${carrera} - ${anio}</h2>
-        <div class='cuadricula'>
-            <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '1er Trimestre')">1er Trimestre</div>
-            <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '2do Trimestre')">2do Trimestre</div>
-            <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '3er Trimestre')">3er Trimestre</div>
-        </div>`;
+      <h2>${carrera} - ${anio}</h2>
+      <div class='cuadricula'>
+        <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '1er Trimestre')">1er Trimestre</div>
+        <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '2do Trimestre')">2do Trimestre</div>
+        <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '3er Trimestre')">3er Trimestre</div>
+      </div>`;
 }
-// Esta función permite reiniciar (eliminar) los datos de asistencia de una combinación específica de carrera, año y trimestre
-function reiniciarDesdePanel() {
-    // Obtenemos los valores seleccionados del panel de administración usando la propiedad `.value`
-    const carrera = document.getElementById('adminCarrera').value;
-    const anio = document.getElementById('adminAnio').value;
-    const trimestre = document.getElementById('adminTrimestre').value;
-
-    // Creamos una clave única concatenando los valores seleccionados
-    // Esta clave será usada para identificar los datos en `localStorage`
-    const clave = `${carrera}_${anio}_${trimestre}`;
-
-    // Confirmamos con el usuario si realmente desea eliminar los datos
-    const confirmar = confirm(`¿Seguro que deseas eliminar todos los datos de asistencia para:\n\n${clave} ?`);
-    if (!confirmar) return; // Si el usuario cancela, terminamos la función
-
-    // Eliminamos los datos del almacenamiento local usando `localStorage.removeItem`
-    localStorage.removeItem(clave); // Elimina la lista de estudiantes
-    localStorage.removeItem(clave + '_fechas'); // Elimina las fechas asociadas
-
-    alert(`Datos eliminados para ${clave}`); // Mostramos confirmación
-    mostrarAnios(carrera); // Redirigimos a la vista de años de esa carrera
-}
-
-// Esta función genera una lista por defecto de 45 estudiantes con nombres genéricos y sin asistencia
-function crearListaEstudiantesPorDefecto() {
-    const estudiantes = []; // Creamos un arreglo vacío
-    for (let i = 1; i <= 45; i++) {
-        // Usamos `push` para insertar objetos con nombre y un objeto vacío para la asistencia
-        estudiantes.push({
-            nombre: `Estudiante ${i}`,
-            asistencia: {} // Objeto vacío que se llenará con las fechas y marcas
-        });
-    }
-    return estudiantes; // Retornamos la lista generada
-}
-
-// Esta función muestra los años escolares para una carrera seleccionada
-function mostrarAnios(carrera) {
-    const contenido = document.getElementById('contenido'); // Obtenemos el contenedor principal
-
-    // Inyectamos HTML dinámicamente al contenedor
-    contenido.innerHTML = `
-        <h2>${carrera}</h2>
-        <div class='cuadricula'>
-            <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '4to')">4to de Secundaria</div>
-            <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '5to')">5to de Secundaria</div>
-            <div class="tarjeta" onclick="mostrarTrimestres('${carrera}', '6to')">6to de Secundaria</div>
-        </div>`;
-}
-
-// Esta función muestra los trimestres disponibles para una carrera y año seleccionados
-function mostrarTrimestres(carrera, anio) {
-    const contenido = document.getElementById('contenido'); // Referencia al div principal
-
-    // Se genera el contenido HTML con tarjetas que permiten elegir cada trimestre
-    contenido.innerHTML = `
-        <h2>${carrera} - ${anio}</h2>
-        <div class='cuadricula'>
-            <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '1er Trimestre')">1er Trimestre</div>
-            <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '2do Trimestre')">2do Trimestre</div>
-            <div class="tarjeta" onclick="mostrarTablaAsistencia('${carrera}', '${anio}', '3er Trimestre')">3er Trimestre</div>
-        </div>`;
-}
-/******************************************************************
- * FUNCIONES PARA ACTUALIZAR, EDITAR Y ELIMINAR DATOS DE ASISTENCIA
- ******************************************************************/
-
-/*
- * Función: actualizarAsistencia
- * Descripción: Actualiza el estado de asistencia de un estudiante específico para una fecha dada.
- * Parámetros:
- *   - claveAlmacenamiento: string que identifica el grupo de estudiantes (ej: 'Sistemas_4to_t1').
- *   - indiceEstudiante: posición del estudiante en la lista (índice del array).
- *   - fecha: string que representa la fecha a actualizar (ej: '2025-05-06').
- *   - valor: string que puede ser "✓", "X" o "" para indicar presente, ausente o sin marcar.
+/**
+ * Función principal que muestra la tabla de asistencia para un grupo específico.
+ * Carga datos de Firestore, crea la tabla con fechas y estudiantes,
+ * y maneja la interfaz para agregar fechas y marcar asistencia si el modo admin está activo.
  */
-function actualizarAsistencia(claveAlmacenamiento, indiceEstudiante, fecha, valor) {
-    // Obtiene la lista de estudiantes desde el localStorage (como string)
-    const listaEstudiantes = JSON.parse(localStorage.getItem(claveAlmacenamiento));
-
-    // Modifica el valor de asistencia para la fecha indicada en el estudiante seleccionado
-    listaEstudiantes[indiceEstudiante].asistencia[fecha] = valor;
-
-    // Guarda la lista actualizada en localStorage, convirtiendo el objeto en string
-    localStorage.setItem(claveAlmacenamiento, JSON.stringify(listaEstudiantes));
-}
-
-/*
- * Función: actualizarNombreEstudiante
- * Descripción: Cambia el nombre de un estudiante según su posición en el array.
- * Parámetros:
- *   - claveAlmacenamiento: string que identifica al grupo (como 'Contaduria_6to_t2').
- *   - indiceEstudiante: número (posición en la lista de estudiantes).
- *   - nuevoNombre: string con el nuevo nombre que se desea asignar.
- */
-function actualizarNombreEstudiante(claveAlmacenamiento, indiceEstudiante, nuevoNombre) {
-    // Carga los estudiantes del almacenamiento local
-    const listaEstudiantes = JSON.parse(localStorage.getItem(claveAlmacenamiento));
-
-    // Cambia el nombre del estudiante
-    listaEstudiantes[indiceEstudiante].nombre = nuevoNombre;
-
-    // Guarda la lista con el nombre actualizado
-    localStorage.setItem(claveAlmacenamiento, JSON.stringify(listaEstudiantes));
-}
-
-/*
- * Función: eliminarFecha
- * Descripción: Elimina una fecha del registro de asistencia y remueve ese dato para todos los estudiantes.
- * Parámetros:
- *   - claveAlmacenamiento: string del grupo (ej. 'Electronica_5to_t3').
- *   - indiceFecha: índice (posición) de la fecha a eliminar en el array de fechas.
- */
-function eliminarFecha(claveAlmacenamiento, indiceFecha) {
-    // Obtiene el array de fechas del almacenamiento o lo inicializa vacío si no existe
-    const fechas = JSON.parse(localStorage.getItem(claveAlmacenamiento + '_fechas')) || [];
-
-    // Elimina la fecha en la posición indicada del array
-    const fechaEliminada = fechas.splice(indiceFecha, 1)[0]; // [0] obtiene el string eliminado
-
-    // Actualiza el array de fechas en el almacenamiento
-    localStorage.setItem(claveAlmacenamiento + '_fechas', JSON.stringify(fechas));
-
-    // Obtiene la lista actual de estudiantes
-    const listaEstudiantes = JSON.parse(localStorage.getItem(claveAlmacenamiento));
-
-    // Recorre a cada estudiante y elimina la propiedad de asistencia correspondiente a la fecha
-    listaEstudiantes.forEach(estudiante => {
-        // delete es una palabra clave de JavaScript que elimina una propiedad de un objeto
-        delete estudiante.asistencia[fechaEliminada];
-    });
-
-    // Guarda la lista de estudiantes sin la fecha eliminada
-    localStorage.setItem(claveAlmacenamiento, JSON.stringify(listaEstudiantes));
-
-    // Extrae los datos de carrera, año y trimestre desde la clave (ej. 'Transformacion_6to_t2')
-    const [carrera, anio, claveTrimestre] = claveAlmacenamiento.split('_');
-
-    // Vuelve a mostrar la tabla actualizada, usando el nombre real del trimestre
-    mostrarTablaAsistencia(carrera, anio, nombresTrimestre[claveTrimestre]);
-}
-
-function mostrarTablaAsistencia(carrera, anio, trimestre) {
+async function mostrarTablaAsistencia(carrera, anio, trimestre) {
     const contenido = document.getElementById('contenido');
-    contenido.innerHTML = `<h2>${carrera} - ${anio} - ${trimestre}</h2>`;
+    contenido.innerHTML = `<h2>${carrera} - ${anio} - ${trimestre}</h2>`; // Título de la tabla
 
-    const claveTrimestre = clavesTrimestre[trimestre];
-    const claveAlmacenamiento = `${carrera}_${anio}_${claveTrimestre}`;
+    const clave = `${carrera}_${anio}_${clavesTrimestre[trimestre]}`; // Clave para Firestore
+    const docRef = window.db.collection("asistencia").doc(clave); // Referencia al documento Firestore
 
-    // Cargar estudiantes
-    let listaEstudiantes = JSON.parse(localStorage.getItem(claveAlmacenamiento));
-    if (!listaEstudiantes) {
-        listaEstudiantes = crearListaEstudiantesPorDefecto(); // genera 45 estudiantes
-        localStorage.setItem(claveAlmacenamiento, JSON.stringify(listaEstudiantes));
+    let datos;
+    const snap = await docRef.get(); // Obtener documento de Firestore (espera la respuesta)
+    if (snap.exists) {
+        datos = snap.data(); // Si existe, obtener los datos
+    } else {
+        datos = {
+            estudiantes: crearListaEstudiantesPorDefecto(), // Si no existe, crear lista por defecto
+            fechas: [] // Y lista vacía de fechas
+        };
+        await docRef.set(datos); // Guardar datos iniciales en Firestore
     }
 
-    // Cargar fechas
-    const fechas = JSON.parse(localStorage.getItem(claveAlmacenamiento + '_fechas')) || [];
-
-    // ✅ Bloque para agregar fechas si está activo el modo administrador
+    // Si el modo administrador está activo, mostrar controles para agregar fechas
     if (modoAdministradorActivo) {
-        const contenedorFecha = document.createElement('div');
-        contenedorFecha.style.margin = '1rem 0';
+        const contenedorFecha = document.createElement('div'); // Crear un contenedor nuevo para fechas
+        contenedorFecha.style.margin = '1rem 0'; // Margen arriba y abajo
 
-        const entradaFecha = document.createElement('input');
-        entradaFecha.type = 'date';
-        entradaFecha.valueAsDate = new Date();
-        entradaFecha.style.marginRight = '0.5rem';
-        entradaFecha.className = 'boton';
+        const entradaFecha = document.createElement('input'); // Crear input para seleccionar fecha
+        entradaFecha.type = 'date'; // Tipo input: selector de fecha
+        entradaFecha.valueAsDate = new Date(); // Valor por defecto: hoy
+        entradaFecha.className = 'boton'; // Clase para estilizar como botón
+        entradaFecha.style.marginRight = '0.5rem'; // Margen derecho para separar del botón
 
-        const botonAgregarFecha = document.createElement('button');
-        botonAgregarFecha.textContent = 'Agregar Fecha';
-        botonAgregarFecha.className = 'boton';
+        const botonAgregarFecha = document.createElement('button'); // Crear botón para agregar fecha
+        botonAgregarFecha.textContent = 'Agregar Fecha'; // Texto del botón
+        botonAgregarFecha.className = 'boton'; // Clase CSS para estilos
 
-        // ✅ Evento correctamente asignado (sin duplicar)
-        botonAgregarFecha.onclick = () => {
-            const fechaSeleccionada = entradaFecha.value;
-            if (fechaSeleccionada) {
-                const [anioStr, mesStr, diaStr] = fechaSeleccionada.split('-');
-                const fechaObjeto = new Date(parseInt(anioStr), parseInt(mesStr) - 1, parseInt(diaStr));
-
-                const dia = String(fechaObjeto.getDate()).padStart(2, '0');
-                const mes = String(fechaObjeto.getMonth() + 1).padStart(2, '0');
-                const anioFecha = fechaObjeto.getFullYear();
-                const fechaFormateada = `${dia}/${mes}/${anioFecha}`; // DD/MM/YYYY
-
-                let fechasActualizadas = JSON.parse(localStorage.getItem(claveAlmacenamiento + '_fechas')) || [];
-
-                if (!fechasActualizadas.includes(fechaFormateada)) {
-                    fechasActualizadas.push(fechaFormateada);
-                    localStorage.setItem(claveAlmacenamiento + '_fechas', JSON.stringify(fechasActualizadas));
-
-                    // ✅ Volvemos a cargar la tabla con la nueva fecha
-                    mostrarTablaAsistencia(carrera, anio, trimestre);
-                } else {
-                    alert("Esa fecha ya está en la lista.");
-                }
+        // Al hacer clic, agrega la fecha seleccionada si no está ya en la lista
+        botonAgregarFecha.onclick = async() => {
+            // La fecha viene en formato 'YYYY-MM-DD', la convertimos a 'DD/MM/YYYY'
+            const fecha = entradaFecha.value.split('-').reverse().join('/');
+            if (!datos.fechas.includes(fecha)) { // Verificar si la fecha no existe ya
+                datos.fechas.push(fecha); // Agregar la fecha al array
+                await docRef.update({ fechas: datos.fechas }); // Actualizar Firestore con nuevas fechas
+                mostrarTablaAsistencia(carrera, anio, trimestre); // Recargar tabla para actualizar vista
+            } else {
+                alert("Esa fecha ya está registrada."); // Mensaje si la fecha ya está en la lista
             }
         };
 
-        contenedorFecha.appendChild(entradaFecha);
-        contenedorFecha.appendChild(botonAgregarFecha);
-        contenido.appendChild(contenedorFecha);
+        contenedorFecha.appendChild(entradaFecha); // Añadir input al contenedor
+        contenedorFecha.appendChild(botonAgregarFecha); // Añadir botón al contenedor
+        contenido.appendChild(contenedorFecha); // Añadir contenedor al contenido principal
     }
 
-    // Crear tabla
+    // Crear tabla HTML para mostrar asistencia
     const tabla = document.createElement('table');
-
-    // ---------- ENCABEZADO ----------
     const encabezado = document.createElement('thead');
-    let filaEncabezado = '<tr><th>#</th><th>Nombre</th>';
+    let filaEncabezado = '<tr><th>#</th><th>Nombre</th>'; // Primera fila con columnas # y Nombre
 
-    fechas.forEach((fecha, indiceFecha) => {
+    // Añadir columnas de fechas
+    datos.fechas.forEach((fecha, i) => {
         if (modoAdministradorActivo) {
-            filaEncabezado += `<th>${fecha}<br>
-                <button onclick="eliminarFecha('${claveAlmacenamiento}', ${indiceFecha})" style="font-size:10px; color:red;">Eliminar</button>
-            </th>`;
+            // En modo admin, mostrar fecha con botón para eliminar fecha
+            filaEncabezado += `<th>${fecha}<br><button onclick="eliminarFecha('${clave}', ${i})" style="font-size:10px; color:red;">Eliminar</button></th>`;
         } else {
+            // En modo usuario, solo mostrar fecha sin botones
             filaEncabezado += `<th>${fecha}</th>`;
         }
     });
-
     filaEncabezado += '</tr>';
     encabezado.innerHTML = filaEncabezado;
     tabla.appendChild(encabezado);
 
-    // ---------- CUERPO ----------
+    // Crear cuerpo de la tabla para estudiantes y sus asistencias
     const cuerpo = document.createElement('tbody');
 
-    listaEstudiantes.forEach((estudiante, indice) => {
+    // Por cada estudiante, crear una fila
+    datos.estudiantes.forEach((est, i) => {
         const fila = document.createElement('tr');
+        // Si modo admin activo, el nombre se muestra en un input editable
+        let celdaNombre = modoAdministradorActivo ?
+            `<input type="text" value="${est.nombre}" onchange="actualizarNombreEstudiante('${clave}', ${i}, this.value)" style="width: 100%; border: none; background: transparent; font-weight: bold;">` :
+            est.nombre; // Si no, se muestra texto simple
 
-        let celdaNombre;
-        if (modoAdministradorActivo) {
-            celdaNombre = `<input type="text" value="${estudiante.nombre}" 
-                onchange="actualizarNombreEstudiante('${claveAlmacenamiento}', ${indice}, this.value)" 
-                style="width: 100%; border: none; background: transparent; font-weight: bold;">`;
-        } else {
-            celdaNombre = estudiante.nombre;
-        }
+        let contenidoFila = `<td>${i + 1}</td><td>${celdaNombre}</td>`; // Número y nombre del estudiante
 
-        let contenidoFila = `<td>${indice + 1}</td><td>${celdaNombre}</td>`;
-
-        fechas.forEach(fecha => {
-            const marca = estudiante.asistencia[fecha] || '';
-
+        // Por cada fecha, mostrar asistencia o selector para cambiarla
+        datos.fechas.forEach(fecha => {
+            const marca = est.asistencia[fecha] || ''; // Obtener marca de asistencia para esa fecha (✓, X o vacío)
             if (modoAdministradorActivo) {
-                contenidoFila += `<td><select onchange="actualizarAsistencia('${claveAlmacenamiento}', ${indice}, '${fecha}', this.value)">
+                // En admin, mostrar selector para marcar asistencia
+                contenidoFila += `<td><select onchange="actualizarAsistencia('${clave}', ${i}, '${fecha}', this.value)">
                     <option value=""></option>
                     <option value="✓" ${marca === '✓' ? 'selected' : ''}>✓</option>
                     <option value="X" ${marca === 'X' ? 'selected' : ''}>X</option>
                 </select></td>`;
             } else {
+                // En usuario, solo mostrar la marca con color según tipo
                 contenidoFila += `<td class="${marca === '✓' ? 'verde' : marca === 'X' ? 'rojo' : ''}">${marca}</td>`;
             }
         });
 
-        fila.innerHTML = contenidoFila;
-        cuerpo.appendChild(fila);
+        fila.innerHTML = contenidoFila; // Insertar la fila completa en HTML
+        cuerpo.appendChild(fila); // Añadir fila al cuerpo de la tabla
     });
 
-    tabla.appendChild(cuerpo);
-    contenido.appendChild(tabla);
+    tabla.appendChild(cuerpo); // Añadir cuerpo a la tabla
+    contenido.appendChild(tabla); // Mostrar tabla en el contenido principal
+}
+
+/**
+ * Actualiza la asistencia de un estudiante en Firestore.
+ * @param {string} clave - Documento Firestore (clave única).
+ * @param {number} i - Índice del estudiante en el array.
+ * @param {string} fecha - Fecha específica a modificar.
+ * @param {string} valor - Nueva marca de asistencia ('✓', 'X' o '').
+ */
+async function actualizarAsistencia(clave, i, fecha, valor) {
+    const ref = window.db.collection("asistencia").doc(clave); // Referencia al documento
+    const snap = await ref.get(); // Obtener documento
+    if (!snap.exists) return; // Si no existe, salir
+    const data = snap.data(); // Obtener datos actuales
+    data.estudiantes[i].asistencia[fecha] = valor; // Actualizar la asistencia en el objeto
+    await ref.update({ estudiantes: data.estudiantes }); // Guardar cambios en Firestore
+}
+
+/**
+ * Actualiza el nombre de un estudiante en Firestore.
+ * @param {string} clave - Documento Firestore.
+ * @param {number} i - Índice del estudiante.
+ * @param {string} nombre - Nuevo nombre para el estudiante.
+ */
+async function actualizarNombreEstudiante(clave, i, nombre) {
+    const ref = window.db.collection("asistencia").doc(clave);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+    const data = snap.data();
+    data.estudiantes[i].nombre = nombre; // Cambiar nombre
+    await ref.update({ estudiantes: data.estudiantes });
+}
+
+/**
+ * Elimina una fecha de asistencia de Firestore y de todos los estudiantes.
+ * @param {string} clave - Documento Firestore.
+ * @param {number} iFecha - Índice de la fecha a eliminar.
+ */
+async function eliminarFecha(clave, iFecha) {
+    const ref = window.db.collection("asistencia").doc(clave);
+    const snap = await ref.get();
+    if (!snap.exists) return;
+    const data = snap.data();
+    const fechaEliminada = data.fechas.splice(iFecha, 1)[0]; // Remover fecha del array
+    data.estudiantes.forEach(e => delete e.asistencia[fechaEliminada]); // Eliminar la marca en cada estudiante
+    await ref.update({ fechas: data.fechas, estudiantes: data.estudiantes }); // Actualizar Firestore
+
+    // Extraer carrera, año y trimestre para recargar la tabla actualizada
+    const [carrera, anio, codTri] = clave.split('_');
+    mostrarTablaAsistencia(carrera, anio, nombresTrimestre[codTri]);
 }

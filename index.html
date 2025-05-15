@@ -1,80 +1,150 @@
 <!DOCTYPE html>
+<!--
+  Declaración del tipo de documento. Indica que este archivo es un documento HTML5.
+-->
 <html lang="es">
+<!--
+  Elemento raíz de la página HTML.
+  El atributo lang="es" indica que el idioma principal del contenido es español.
+-->
 
 <head>
+    <!--
+      Contiene metadatos, enlaces a estilos, scripts y el título de la página.
+    -->
     <meta charset="UTF-8">
+    <!--
+      Define la codificación de caracteres del documento como UTF-8,
+      que soporta caracteres especiales y acentos propios del español.
+    -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--
+      Hace que el diseño sea responsivo en dispositivos móviles.
+      width=device-width indica que el ancho de la página debe ser igual al ancho del dispositivo.
+      initial-scale=1.0 indica que el zoom inicial es del 100%.
+    -->
     <title>Control de Asistencia</title>
+    <!--
+      El título que aparece en la pestaña del navegador.
+    -->
     <link rel="stylesheet" href="css/estilo.css">
+    <!--
+      Enlace externo a la hoja de estilos CSS.
+      href="css/estilo.css" indica la ruta al archivo CSS que contiene los estilos de la página.
+    -->
+
+    <!-- Firebase SDKs -->
+    <!-- SDKs de Firebase compatibles con HTML sin módulos -->
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+    <!--
+      Carga la biblioteca principal de Firebase (modo compatibilidad para navegadores sin soporte de módulos ES).
+      Permite inicializar la app Firebase en el navegador.
+    -->
+    <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-firestore-compat.js"></script>
+    <!--
+      Carga la biblioteca Firestore (base de datos en la nube) en modo compatibilidad.
+      Permite conectar y manipular la base de datos Firestore desde JavaScript.
+    -->
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHJ8aSCB3RONaXUe0qC8cm5zdZoxfP8y4",
+            authDomain: "control-asistencia-colegio.firebaseapp.com",
+            projectId: "control-asistencia-colegio",
+            storageBucket: "control-asistencia-colegio.firebasestorage.app",
+            messagingSenderId: "915266704368",
+            appId: "1:915266704368:web:db98aa79463a3b435b8335"
+        };
+        /*
+          Objeto con la configuración específica de tu proyecto Firebase.
+          Incluye las claves API y los identificadores que conectan esta web con tu proyecto Firebase.
+          Estos datos son necesarios para autenticar y enlazar tu app web con Firebase.
+        */
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        /*
+          Inicializa la app Firebase en el navegador con la configuración anterior.
+          Esto crea una instancia que se puede usar para acceder a los servicios Firebase.
+        */
+
+        const db = firebase.firestore();
+        /*
+          Obtiene una referencia a la base de datos Firestore.
+          `db` será la variable para manipular colecciones y documentos en Firestore.
+        */
+
+        window.db = db; // lo hace accesible desde js.js
+        /*
+          Asigna la referencia `db` al objeto global `window` para que sea accesible desde otros scripts,
+          en este caso, desde el archivo externo `js/js.js`.
+        */
+    </script>
 </head>
 
 <body>
-    <!-- El encabezado principal de la página -->
+    <!--
+      body es Contenido visible de la página.
+      Todo lo que el usuario verá o interactuará dentro del navegador.
+    -->
     <header class="header">
-        <!-- <header>: sección semántica que representa la cabecera de la página -->
-
-        <!-- Título de la página -->
+        <!--
+          header es Elemento semántico para definir la cabecera o encabezado de la página.
+          La clase "header" permite aplicar estilos específicos desde CSS.
+        -->
         <h1 class="titulo">Control de Asistencia</h1>
-        <!-- <h1>: encabezado de nivel 1, generalmente se usa para títulos principales.
-         class="titulo": permite aplicar estilos CSS a este elemento -->
-
-        <!-- Botón que activa el modo administrador -->
+        <!--
+          h1 es Título principal de la página (nivel 1).
+          La clase "titulo" permite aplicar estilos CSS específicos.
+        -->
         <button class="boton" onclick="activarModoAdministrador()">Modo Administrador</button>
-        <!-- <button>: crea un botón interactivo.
-         class="boton": clase para estilizar el botón desde CSS.
-         onclick="activarModoAdministrador()": llama a la función JavaScript cuando se hace clic -->
+        <!--
+          button Botón que activa el modo administrador.
+          class="boton" para estilizar el botón desde CSS.
+          onclick="activarModoAdministrador()" llama a la función JavaScript que activa el modo admin.
+        -->
 
-        <!-- Botón para mostrar el panel de administración -->
-        <button class="boton" onclick="mostrarPanelAdministrador()">🛠 Panel de Administración</button>
-        <!-- Se incluye un emoji como ícono dentro del texto del botón -->
     </header>
 
-    <!-- Contenedor principal del contenido -->
     <main id="principal">
-        <!-- <main>: etiqueta semántica que contiene el contenido principal del sitio.
-         id="principal": identificador único que permite acceder a este elemento desde JavaScript o CSS -->
-
-        <!-- Sección de las carreras, organizada en forma de cuadrícula -->
+        <!--
+          Elemento semántico que contiene el contenido principal de la página.
+          El atributo id="principal" permite referenciarlo desde CSS o JavaScript.
+        -->
         <div class="grid" id="carreras">
-            <!-- <div>: contenedor genérico.
-             class="cuadricula": se usará para aplicar un estilo tipo grid o cuadrícula.
-             id="carreras": permite seleccionar esta sección desde JavaScript o CSS -->
-
-            <!-- Cada una de estas "tarjetas" representa una carrera técnica -->
-
-            <div class="tarjeta sistemas" onclick="mostrarAnios('Sistemas Informáticos')">
-                Sistemas Informáticos
-            </div>
-            <!-- class="tarjeta sistemas": combinación de clases, una general (tarjeta) y una específica (sistemas).
-             onclick="mostrarAnios('Sistemas Informáticos')": ejecuta una función JavaScript pasando el nombre de la carrera como argumento -->
-
-            <div class="tarjeta electronica" onclick="mostrarAnios('Electrónica')">
-                Electrónica
-            </div>
-            <!-- Similar al anterior, pero con otra carrera y clase específica -->
-
-            <div class="tarjeta alimentos" onclick="mostrarAnios('Transformación de Alimentos')">
-                Transformación de Alimentos
-            </div>
-
-            <div class="tarjeta contaduria" onclick="mostrarAnios('Contaduría General')">
-                Contaduría General
-            </div>
-
-            <!-- Estas tarjetas permiten al usuario seleccionar una carrera, lo que probablemente mostrará los años o niveles -->
+            <!--
+              Contenedor con clase "grid" que aplica un diseño de cuadrícula (grid layout) desde CSS.
+              id="carreras" permite seleccionarlo en JS para manipular su contenido.
+            -->
+            <div class="tarjeta sistemas" onclick="mostrarAnios('Sistemas Informáticos')">Sistemas Informáticos</div>
+            <!--
+              Cada uno de estos divs es una "tarjeta" para representar una carrera.
+              Clase "tarjeta" para estilo general de tarjetas.
+              Clase "sistemas" para estilos específicos de la carrera Sistemas Informáticos (color, iconos, etc).
+              onclick llama a función JS que mostrará los años disponibles para la carrera especificada.
+              Texto visible: nombre de la carrera.
+            -->
+            <div class="tarjeta electronica" onclick="mostrarAnios('Electrónica')">Electrónica</div>
+            <div class="tarjeta alimentos" onclick="mostrarAnios('Transformación de Alimentos')">Transformación de Alimentos</div>
+            <div class="tarjeta contaduria" onclick="mostrarAnios('Contaduría General')">Contaduría General</div>
+            <!--
+              Tarjetas similares para otras carreras, cada una con clases específicas para estilos.
+            -->
         </div>
-
-        <!-- Contenedor donde se mostrará contenido dinámico al seleccionar una carrera -->
         <div id="contenido"></div>
-        <!-- id="contenido": se utilizará con JavaScript para insertar contenido como trimestres, listas de estudiantes, etc. -->
+        <!--
+          Contenedor vacío con id="contenido".
+          Aquí se inyectará contenido dinámico desde JavaScript: años, trimestres, tablas, etc.
+        -->
     </main>
 
-    <!-- Enlace al archivo JavaScript externo que contiene la lógica de la aplicación -->
     <script src="js/js.js"></script>
-    <!-- <script>: etiqueta que permite incluir código JavaScript.
-     src="js/js.js": ruta al archivo externo. 
-     Es una buena práctica colocarlo al final para que el HTML cargue antes de que se ejecute el JS -->
-
+    <!--
+      Enlace a un archivo JavaScript externo.
+      js/js.js contiene la lógica principal para la interacción de la página,
+      manejo de datos y comunicación con Firebase.
+      Se carga al final para que el HTML esté listo antes de ejecutar el JS.
+    -->
 </body>
 
 </html>
